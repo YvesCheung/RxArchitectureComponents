@@ -12,13 +12,16 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
  */
-
 package android.arch.rxlifecycle;
 
 import android.app.Activity;
 import android.app.Application;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -29,6 +32,19 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * 修改说明：
+ * 目前公司项目中使用的support-v4包是版本24的，而且使用Small插件化框架导致暂时无法升级到版本26，所以没办法使用
+ * {@link FragmentManager} 中的 {@code FragmentLifecycleCallbacks}，迫于无奈把
+ * {@code holderFragmentFor(Fragment parentFragment)} 对应的实现替换成了
+ * {@code Glide.with(Fragment fragment)} 的解决方案
+ * <p>
+ * Modification：
+ * At present, the support-v4 package used in the company project is version 24, and using the Small
+ * plug-in framework causes a temporary failure to upgrade to version 26, so there is no way to use
+ * the {@code FragmentLifecycleCallbacks} in the {@link FragmentManager}, and the implementation of the
+ * {@code holderFragmentFor(Fragment parentFragment)} cannot be achieved. Replaced with
+ * {@code Glide.with(Fragment fragment)} solution
+ *
  * @hide
  */
 public class HolderFragment extends Fragment {
@@ -83,8 +99,22 @@ public class HolderFragment extends Fragment {
 
     @SuppressWarnings("WeakerAccess")
     static class HolderFragmentManager {
+        private static final int ID_REMOVE_SUPPORT_FRAGMENT_MANAGER = 2;
+
         private Map<Activity, HolderFragment> mNotCommittedActivityHolders = new HashMap<>();
-        private Map<Fragment, HolderFragment> mNotCommittedFragmentHolders = new HashMap<>();
+        private Map<FragmentManager, HolderFragment> mNotCommittedFragmentHolders = new HashMap<>();
+
+        private Handler handler = new Handler(Looper.getMainLooper(), new Handler.Callback() {
+            @Override
+            public boolean handleMessage(Message message) {
+                if (message.what == ID_REMOVE_SUPPORT_FRAGMENT_MANAGER) {
+                    FragmentManager supportFm = (FragmentManager) message.obj;
+                    mNotCommittedFragmentHolders.remove(supportFm);
+                    return true;
+                }
+                return false;
+            }
+        });
 
         private Application.ActivityLifecycleCallbacks mActivityCallbacks =
                 new EmptyActivityLifecycleCallbacks() {
@@ -98,19 +128,6 @@ public class HolderFragment extends Fragment {
                 };
 
         private boolean mActivityCallbacksIsAdded = false;
-
-        private FragmentLifecycleCallbacks mParentDestroyedCallback =
-                new FragmentLifecycleCallbacks() {
-                    @Override
-                    public void onFragmentDestroyed(FragmentManager fm, Fragment parentFragment) {
-                        super.onFragmentDestroyed(fm, parentFragment);
-                        HolderFragment fragment = mNotCommittedFragmentHolders.remove(
-                                parentFragment);
-                        if (fragment != null) {
-                            Log.e(LOG_TAG, "Failed to save a ViewModel for " + parentFragment);
-                        }
-                    }
-                };
 
         private static HolderFragment findHolderFragment(FragmentManager manager) {
             if (manager.isDestroyed()) {
@@ -134,9 +151,7 @@ public class HolderFragment extends Fragment {
         void holderFragmentCreated(Fragment holderFragment) {
             Fragment parentFragment = holderFragment.getParentFragment();
             if (parentFragment != null) {
-                mNotCommittedFragmentHolders.remove(parentFragment);
-                parentFragment.getFragmentManager().unregisterFragmentLifecycleCallbacks(
-                        mParentDestroyedCallback);
+                mNotCommittedFragmentHolders.remove(parentFragment.getChildFragmentManager());
             } else {
                 mNotCommittedActivityHolders.remove(holderFragment.getActivity());
             }
@@ -168,15 +183,14 @@ public class HolderFragment extends Fragment {
             if (holder != null) {
                 return holder;
             }
-            holder = mNotCommittedFragmentHolders.get(parentFragment);
+            holder = mNotCommittedFragmentHolders.get(fm);
             if (holder != null) {
                 return holder;
             }
 
-            parentFragment.getFragmentManager()
-                    .registerFragmentLifecycleCallbacks(mParentDestroyedCallback, false);
             holder = createHolderFragment(fm);
-            mNotCommittedFragmentHolders.put(parentFragment, holder);
+            mNotCommittedFragmentHolders.put(fm, holder);
+            handler.obtainMessage(ID_REMOVE_SUPPORT_FRAGMENT_MANAGER, fm).sendToTarget();
             return holder;
         }
     }
