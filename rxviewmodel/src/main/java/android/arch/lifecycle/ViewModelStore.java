@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package android.arch.rxlifecycle;
+package android.arch.lifecycle;
 
 import java.util.HashMap;
 
@@ -30,7 +30,7 @@ import java.util.HashMap;
  * then it should call {@link #clear()} on this {@code ViewModelStore}, so {@code ViewModels} would
  * be notified that they are no longer used.
  * <p>
- * {@link android.arch.rxlifecycle.ViewModelStores} provides a {@code ViewModelStore} for
+ * {@link ViewModelStores} provides a {@code ViewModelStore} for
  * activities and fragments.
  */
 public class ViewModelStore {

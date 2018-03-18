@@ -1,7 +1,7 @@
 package android.arch.archsample;
 
-import android.arch.rxlifecycle.ViewModel;
-import android.arch.rxlifecycle.ViewModelProviders;
+import android.arch.lifecycle.ViewModel;
+import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;

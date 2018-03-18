@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package android.arch.rxlifecycle;
+package android.arch.lifecycle;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Application;
-import android.arch.rxlifecycle.ViewModelProvider.Factory;
+import android.arch.lifecycle.ViewModelProvider.Factory;
 import android.support.annotation.MainThread;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;

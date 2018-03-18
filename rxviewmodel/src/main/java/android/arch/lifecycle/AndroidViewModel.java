@@ -14,24 +14,32 @@
  * limitations under the License.
  */
 
-package android.arch.rxlifecycle;
+package android.arch.lifecycle;
 
+import android.annotation.SuppressLint;
+import android.app.Application;
 import android.support.annotation.NonNull;
 
 /**
- * A scope that owns {@link ViewModelStore}.
+ * Application context aware {@link ViewModel}.
  * <p>
- * A responsibility of an implementation of this interface is to retain owned ViewModelStore
- * during the configuration changes and call {@link ViewModelStore#clear()}, when this scope is
- * going to be destroyed.
+ * Subclasses must have a constructor which accepts {@link Application} as the only parameter.
+ * <p>
  */
-@SuppressWarnings("WeakerAccess")
-public interface ViewModelStoreOwner {
+public class AndroidViewModel extends ViewModel {
+    @SuppressLint("StaticFieldLeak")
+    private Application mApplication;
+
+    public AndroidViewModel(@NonNull Application application) {
+        mApplication = application;
+    }
+
     /**
-     * Returns owned {@link ViewModelStore}
-     *
-     * @return a {@code ViewModelStore}
+     * Return the application.
      */
     @NonNull
-    ViewModelStore getViewModelStore();
+    public <T extends Application> T getApplication() {
+        //noinspection unchecked
+        return (T) mApplication;
+    }
 }

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package android.arch.rxlifecycle;
+package android.arch.lifecycle;
 
 import android.support.annotation.MainThread;
 import android.support.annotation.NonNull;
@@ -22,7 +22,7 @@ import android.support.annotation.NonNull;
  * An utility class that provides {@code ViewModels} for a scope.
  * <p>
  * Default {@code ViewModelProvider} for an {@code Activity} or a {@code Fragment} can be obtained
- * from {@link android.arch.rxlifecycle.ViewModelProviders} class.
+ * from {@link ViewModelProviders} class.
  */
 @SuppressWarnings("WeakerAccess")
 public class ViewModelProvider {

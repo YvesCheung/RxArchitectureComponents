@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package android.arch.rxlifecycle;
+package android.arch.lifecycle;
 
 import android.app.Activity;
 import android.app.Application;

@@ -1,6 +1,6 @@
 package android.arch.archsample
 
-import android.arch.rxlifecycle.ViewModelProviders
+import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.util.Log

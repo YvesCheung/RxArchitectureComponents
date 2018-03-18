@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package android.arch.rxlifecycle;
+package android.arch.lifecycle;
 
 import android.support.annotation.MainThread;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 
-import static android.arch.rxlifecycle.HolderFragment.holderFragmentFor;
+import static android.arch.lifecycle.HolderFragment.holderFragmentFor;
 
 /**
  * Factory methods for {@link ViewModelStore} class.

@@ -1,6 +1,6 @@
 package android.arch.archsample;
 
-import android.arch.rxlifecycle.ViewModel;
+import android.arch.lifecycle.ViewModel;
 
 /**
  * Created by 张宇 on 2018/3/12.
@@ -9,4 +9,10 @@ import android.arch.rxlifecycle.ViewModel;
  */
 
 public class MyViewModel extends ViewModel {
+
+    @Override
+    protected void onCleared() {
+        super.onCleared();
+        LogUtil.i("onCleared");
+    }
 }
