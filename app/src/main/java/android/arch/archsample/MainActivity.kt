@@ -8,9 +8,9 @@ import io.reactivex.disposables.Disposable
 
 class MainActivity : AppCompatActivity() {
 
-    val viewModel by lazy { ViewModelProviders.of(this).get(MyViewModel::class.java) }
+    private val viewModel by lazy { ViewModelProviders.of(this).get(MyViewModel::class.java) }
 
-    lateinit var disposable: Disposable
+    private lateinit var disposable: Disposable
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
