@@ -26,6 +26,71 @@ Google官方推出了 [ViewModel][1] 和 [LiveData][2] 等非常实用的组件�
 
 ``LiveData`` 就完全不能用了。因为在 **support-26** 包中，所有 ``Activity`` 和 ``Fragment`` 都会实现 ``LifecycleOwner`` 这个接口，用于提供生命周期的监听，低版本的我们不一样。不过我们有 [RxLifecycle][5] 可以完成相似的任务，所以用 [RxJava][6] 的API实现了一个 ``RxLiveData``，用于取代 ``LiveData``。
 
+### RxLiveData与LiveData的区别：
+|RxLiveData|LiveData
+|:---:|:---:|
+|线程安全|非线程安全，只能用于主线程|
+|value不能为 **null** |value允许为 **null** |
+|支持所有 **Reactive** 操作符|支持 **Map/SwitchMap/Merge** 等，其余自行实现|
+|可以绑定 ``RxLifecycle`` 生命周期|可以绑定 ``LifecycleOwner`` 生命周期|
+
+### RxLiveData的使用
+
+``RxLiveData`` 的构造用法完全与Google官方提供的相同，除了一点：``RxLiveData`` 是线程安全的，你可以在异步操作中直接使用 **setValue** 方法。所以 ``RxLiveData`` 中是没有 **postValue** 方法的。你可以通过[这里][2]了解更多。
+
+```Java
+public class StockLiveData extends LiveData<BigDecimal> {
+    private StockManager mStockManager;
+
+    private SimplePriceListener mListener = new SimplePriceListener() {
+        @Override
+        public void onPriceChanged(BigDecimal price) {
+            setValue(price);
+        }
+    };
+
+    public StockLiveData(String symbol) {
+        mStockManager = new StockManager(symbol);
+    }
+
+    @Override
+    protected void onActive() {
+        mStockManager.requestPriceUpdates(mListener);
+    }
+
+    @Override
+    protected void onInactive() {
+        mStockManager.removeUpdates(mListener);
+    }
+}
+```
+
+订阅操作就不一样了，RxLiveData用的是Reactive的接口：
+```Java
+public class Fragment2 extends RxFragment{
+    //...
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+    
+        // `this` should be a LifecycleProvider like RxActivity or RxFragment
+        // Without `bindLifecycle()`, it is equivalent to `ObserveForever`
+        liveData.bindLifecycle(this)
+                .map(new Function<BigDecimal, String>() {
+                    @Override
+                    public String apply(BigDecimal bigDecimal) throws Exception {
+                        return bigDecimal.toEngineeringString();
+                    }
+                })
+                .subscribe(new Consumer<String>() {
+                    @Override
+                    public void accept(String s) throws Exception {
+                        editText.setText(s);
+                    }
+                });
+    }
+}
+```
+
 ## 配置
 1. 项目build.gradle添加、
 ```groovy
