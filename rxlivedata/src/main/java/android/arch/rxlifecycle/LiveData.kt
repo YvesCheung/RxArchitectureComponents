@@ -34,9 +34,9 @@ abstract class LiveData<DATA> : Observable<DATA>() {
         return compose(lifecycle.bindToLifecycle())
     }
 
-    open fun onActive() {}
+    protected open fun onActive() {}
 
-    open fun onInactive() {}
+    protected open fun onInactive() {}
 
     private inner class LiveDataObservable(
             val actual: Observer<in DATA>
